@@ -48,7 +48,7 @@ if (!empty($image_url)) {
     if (strpos($image_url, 'uploads/') === 0) {
         // Path lengkap ke file gambar dari root
         $full_path = dirname(__DIR__) . '/' . $image_url;
-        
+
         // Cek apakah file benar-benar ada
         if (file_exists($full_path)) {
             $valid_image = true;
@@ -64,7 +64,7 @@ if (!empty($image_url)) {
                 $valid_image = false;
             }
         }
-    } 
+    }
     // Cek apakah ini URL lengkap (http:// atau https://)
     elseif (strpos($image_url, 'http') === 0) {
         $valid_image = true;
@@ -74,179 +74,192 @@ if (!empty($image_url)) {
 
 // Jika tidak ada gambar valid, gunakan placeholder
 if (!$valid_image) {
-    // Buat warna random berdasarkan nama produk (tema Deep Navy)
-    $colors = ['1f2462', '2a2f7a', '141844', '0f172a'];
+    // Buat warna random berdasarkan nama produk (tema Dark Olive)
+    $colors = ['3D405B', 'E07A5F', '81B29A', 'F2CC8F'];
     $color = $colors[abs(crc32($product['name'])) % count($colors)];
-    $image_src = 'https://placehold.co/800x400/' . $color . '/white?text=' . rawurlencode(substr($product['name'], 0, 30));
+    $image_src = 'https://placehold.co/800x500/' . $color . '/FFF8F0?text=' . rawurlencode(substr($product['name'], 0, 20));
 }
 ?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title><?= htmlspecialchars($product['name']) ?> - LSP COACHPRO INDONESIA</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title><?= htmlspecialchars($product['name']) ?> - Dapur Nusantara</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
     <style>
+        :root {
+            --color-cream: #FFF8F0;
+            --color-olive: #3D405B;
+            --color-terracotta: #E07A5F;
+            --color-terracotta-light: #fce7e1;
+            --color-mute: #8a8f9c;
+            --color-border: #f0f0f0;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'Inter', sans-serif;
-            background: #f5f7fa;
-            padding: 24px;
+            font-family: 'Outfit', sans-serif;
+            background: var(--color-cream);
+            padding: 40px 20px;
             min-height: 100vh;
+            color: var(--color-olive);
         }
-        
+
         .container {
             max-width: 1100px;
             margin: 0 auto;
             background: #ffffff;
-            border-radius: 32px;
+            border-radius: 24px;
             overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 20px 50px rgba(61, 64, 91, 0.08);
             animation: fadeIn 0.5s ease;
         }
-        
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        
+
         /* Product Image */
         .product-image-container {
             position: relative;
-            background: linear-gradient(135deg, #f0fdfa 0%, #e6f4f0 100%);
-            min-height: 200px;
+            background: var(--color-cream);
+            min-height: 300px;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
         }
-        
+
         .product-image {
             width: 100%;
-            height: 420px;
+            height: 450px;
             object-fit: cover;
             display: block;
             transition: transform 0.5s ease;
+            opacity: 0;
         }
-        
+
         .product-image-container:hover .product-image {
-            transform: scale(1.02);
+            transform: scale(1.03);
         }
-        
+
         /* Product Info */
         .product-info {
-            padding: 2.5rem;
+            padding: 3rem;
         }
-        
+
         /* Breadcrumb */
         .breadcrumb {
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.5rem;
             font-size: 0.85rem;
-            color: #8ba0ae;
+            color: var(--color-mute);
             display: flex;
             align-items: center;
             flex-wrap: wrap;
             gap: 0.5rem;
         }
-        
+
         .breadcrumb a {
-            color: #1f2462;
+            color: var(--color-olive);
             text-decoration: none;
             transition: color 0.2s;
             font-weight: 500;
         }
-        
+
         .breadcrumb a:hover {
-            color: #e8b830;
-            text-decoration: underline;
+            color: var(--color-terracotta);
         }
-        
+
         .breadcrumb i {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: #cbd5e1;
         }
-        
+
         .breadcrumb span {
-            color: #5a6e7a;
+            color: var(--color-mute);
         }
-        
+
         /* Category Badge */
         .product-category {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: #eef1ff;
-            color: #1f2462;
-            padding: 0.35rem 1rem;
-            border-radius: 40px;
+            background: var(--color-terracotta-light);
+            color: var(--color-terracotta);
+            padding: 6px 16px;
+            border-radius: 50px;
             font-size: 0.75rem;
             font-weight: 600;
             margin-bottom: 1.2rem;
-            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        
-        .product-category i {
-            font-size: 0.7rem;
-            color: #e8b830;
-        }
-        
+
         /* Title */
         .product-title {
-            font-size: 2.2rem;
-            margin-bottom: 0.75rem;
-            color: #1a2a3a;
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--color-olive);
             font-weight: 700;
-            line-height: 1.3;
-            letter-spacing: -0.02em;
+            line-height: 1.2;
         }
-        
+
         /* Price */
         .product-price {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: #e8b830;
-            margin-bottom: 1.5rem;
-            display: inline-block;
-            background: #eef1ff;
-            padding: 0.35rem 1.2rem;
-            border-radius: 60px;
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-terracotta);
+            margin-bottom: 2rem;
+            display: block;
         }
-        
+
         /* Description */
         .product-description {
-            color: #475569;
+            color: #555a6e;
             line-height: 1.8;
             margin-bottom: 2rem;
             font-size: 1rem;
         }
-        
+
         /* Button Group */
         .button-group {
             display: flex;
             gap: 1rem;
             flex-wrap: wrap;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
-        
-        /* Button Detail / Demo */
-        .btn-demo {
-            background: #1a2a3a;
-            color: white;
-            padding: 0.85rem 1.8rem;
-            border-radius: 60px;
+
+        /* Button Cart */
+        .btn-cart {
+            background: var(--color-terracotta);
+            color: #ffffff;
+            padding: 14px 28px;
+            border-radius: 12px;
             text-decoration: none;
             font-weight: 600;
             display: inline-flex;
@@ -255,210 +268,141 @@ if (!$valid_image) {
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            font-family: 'Outfit', sans-serif;
+            box-shadow: 0 4px 15px rgba(224, 122, 95, 0.2);
         }
-        
-        .btn-demo i {
-            font-size: 0.9rem;
-        }
-        
-        .btn-demo:hover {
-            background: #1f2462;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(31, 36, 98, 0.25);
-        }
-        
-        /* Button Simpan ke Cart */
-        .btn-cart {
-            background: #f8faf8;
-            color: #1a2a3a;
-            padding: 0.85rem 1.8rem;
-            border-radius: 60px;
-            text-decoration: none;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.6rem;
-            transition: all 0.3s ease;
-            border: 1px solid #eef2f0;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-        
-        .btn-cart i {
-            font-size: 0.9rem;
-        }
-        
+
         .btn-cart:hover {
-            background: #eef1ff;
-            border-color: #e8b830;
-            color: #1f2462;
+            background: #c8674d;
             transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(224, 122, 95, 0.3);
         }
-        
+
         /* Button WhatsApp */
         .btn-wa {
-            background: linear-gradient(135deg, #25D366, #1da85e);
-            color: white;
-            padding: 0.85rem 1.8rem;
-            border-radius: 60px;
+            background: #ffffff;
+            color: #25D366;
+            padding: 14px 28px;
+            border-radius: 12px;
             text-decoration: none;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
             gap: 0.6rem;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
-            font-size: 0.9rem;
+            border: 1.5px solid #e2e8f0;
+            font-size: 0.95rem;
         }
-        
-        .btn-wa i {
-            font-size: 0.9rem;
-        }
-        
+
         .btn-wa:hover {
-            background: linear-gradient(135deg, #1da85e, #158a4d);
+            background: #25D366;
+            color: #fff;
+            border-color: #25D366;
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3);
         }
-        
+
         /* Divider */
         .divider {
-            margin: 1.5rem 0;
+            margin: 2rem 0;
             border: none;
             height: 1px;
-            background: linear-gradient(90deg, #eef2f0, #e8b830, #eef2f0);
+            background: var(--color-border);
         }
-        
+
         /* Back Button */
         .btn-back {
             display: inline-flex;
             align-items: center;
             gap: 0.6rem;
-            color: #1f2462;
+            color: var(--color-mute);
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 500;
             transition: all 0.2s;
             font-size: 0.9rem;
         }
-        
+
         .btn-back:hover {
             gap: 1rem;
-            color: #e8b830;
+            color: var(--color-olive);
         }
-        
-        /* Feature List (Opsional - jika ingin menambah fitur) */
+
+        /* Feature List */
         .feature-list {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
-            margin: 1.5rem 0;
-            padding: 1rem 0;
+            margin: 1.5rem 0 2rem 0;
+            padding: 1.5rem;
+            background: var(--color-cream);
+            border-radius: 16px;
         }
-        
+
         .feature-item {
             display: flex;
             align-items: center;
             gap: 10px;
-            color: #475569;
-            font-size: 0.85rem;
+            color: var(--color-olive);
+            font-size: 0.9rem;
+            font-weight: 500;
         }
-        
+
         .feature-item i {
-            color: #e8b830;
+            color: var(--color-terracotta);
             font-size: 1rem;
             width: 24px;
         }
-        
+
         /* ========== RESPONSIVE ========== */
-        
         @media (max-width: 768px) {
             body {
-                padding: 16px;
+                padding: 0;
             }
-            
+
+            .container {
+                border-radius: 0;
+            }
+
             .product-image {
-                height: 260px;
+                height: 280px;
             }
-            
+
             .product-info {
                 padding: 1.5rem;
             }
-            
+
             .product-title {
-                font-size: 1.6rem;
+                font-size: 1.8rem;
             }
-            
+
             .product-price {
-                font-size: 1.3rem;
-                padding: 0.25rem 1rem;
+                font-size: 1.5rem;
             }
-            
+
             .button-group {
                 flex-direction: column;
             }
-            
-            .btn-demo, .btn-cart, .btn-wa {
+
+            .btn-cart,
+            .btn-wa {
                 text-align: center;
                 justify-content: center;
-                padding: 0.7rem 1.5rem;
             }
-            
-            .feature-list {
-                grid-template-columns: 1fr;
-                gap: 0.8rem;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            body {
-                padding: 12px;
-            }
-            
-            .product-image {
-                height: 200px;
-            }
-            
-            .product-info {
-                padding: 1.2rem;
-            }
-            
-            .product-title {
-                font-size: 1.3rem;
-            }
-            
-            .product-price {
-                font-size: 1.1rem;
-            }
-            
-            .product-description {
-                font-size: 0.9rem;
-                line-height: 1.6;
-            }
-            
-            .breadcrumb {
-                font-size: 0.7rem;
-            }
-        }
-        
-        /* Loading animation untuk gambar */
-        .product-image {
-            opacity: 0;
-            transition: opacity 0.4s ease;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <!-- Container Gambar -->
         <div class="product-image-container">
-            <img src="<?= htmlspecialchars($image_src) ?>" 
-                 alt="<?= htmlspecialchars($product['name']) ?>" 
-                 class="product-image" 
-                 onerror="this.onerror=null; this.src='https://placehold.co/800x400/1f2462/white?text=Gambar+Tidak+Tersedia';"
-                 onload="this.style.opacity='1'">
+            <img src="<?= htmlspecialchars($image_src) ?>"
+                alt="<?= htmlspecialchars($product['name']) ?>"
+                class="product-image"
+                onerror="this.onerror=null; this.src='https://placehold.co/800x500/3D405B/FFF8F0?text=Gambar+Tidak+Tersedia';"
+                onload="this.style.opacity='1'">
         </div>
-        
+
         <div class="product-info">
             <!-- Breadcrumb -->
             <div class="breadcrumb">
@@ -466,68 +410,62 @@ if (!$valid_image) {
                 <i class="fas fa-chevron-right"></i>
                 <span><?= htmlspecialchars($product['name']) ?></span>
             </div>
-            
+
             <!-- Category Badge -->
             <div class="product-category">
-                <i class="fas fa-tag"></i> <?= htmlspecialchars($product['category_name']) ?>
+                <i class="fas fa-utensils"></i> <?= htmlspecialchars($product['category_name']) ?>
             </div>
-            
+
             <!-- Title -->
             <h1 class="product-title"><?= htmlspecialchars($product['name']) ?></h1>
-            
+
             <!-- Price -->
-            <div class="product-price"><?= htmlspecialchars($product['price']) ?></div>
-            
+            <div class="product-price">Rp <?= number_format(htmlspecialchars($product['price']), 0, ',', '.') ?></div>
+
             <!-- Description -->
             <div class="product-description">
                 <?= nl2br(htmlspecialchars($product['description'])) ?>
             </div>
-            
-            <!-- Feature List (Opsional - tampilkan jika ada fitur, bisa diisi dari database nanti) -->
+
+            <!-- Feature List (Opsional) -->
             <?php if (!empty($product['features'])): ?>
-            <div class="feature-list">
-                <?php 
-                $features = explode(',', $product['features']);
-                foreach ($features as $feature): 
-                ?>
-                <div class="feature-item">
-                    <i class="fas fa-check-circle"></i>
-                    <span><?= htmlspecialchars(trim($feature)) ?></span>
+                <div class="feature-list">
+                    <?php
+                    $features = explode(',', $product['features']);
+                    foreach ($features as $feature):
+                    ?>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span><?= htmlspecialchars(trim($feature)) ?></span>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
-                <?php endforeach; ?>
-            </div>
             <?php endif; ?>
-            
+
             <!-- Button Group -->
             <div class="button-group">
-                <?php if (!empty($product['demo_link'])): ?>
-                    <a href="<?= htmlspecialchars($product['demo_link']) ?>" class="btn-demo" target="_blank">
-                        <i class="fas fa-desktop"></i> Lihat Demo
-                    </a>
-                <?php endif; ?>
-                
                 <!-- Tombol Simpan ke Cart -->
-                <button class="btn-cart" 
-                        onclick="addToCart(<?= $product['id'] ?>, '<?= addslashes(htmlspecialchars($product['name'])) ?>', '<?= addslashes(htmlspecialchars($product['price'])) ?>')">
-                    <i class="fas fa-shopping-cart"></i> Simpan ke Keranjang
+                <button class="btn-cart"
+                    onclick="addToCart(<?= $product['id'] ?>, '<?= addslashes(htmlspecialchars($product['name'])) ?>', '<?= addslashes(htmlspecialchars($product['price'])) ?>')">
+                    <i class="fas fa-shopping-bag"></i> Pesan Sekarang
                 </button>
 
-                <a href="https://wa.me/<?= $wa_number ?>?text=Halo%2C%20saya%20tertarik%20dengan%20paket%20<?= rawurlencode($product['name']) ?>%20di%20LSP%20COACHPRO%20INDONESIA.%20Apakah%20masih%20tersedia%3F" 
-                   class="btn-wa" target="_blank">
-                    <i class="fab fa-whatsapp"></i> Konsultasi via WhatsApp
+                <a href="https://wa.me/<?= $wa_number ?>?text=Halo%2C%20saya%20tertarik%20dengan%20menu%20<?= rawurlencode($product['name']) ?>%20di%20Dapur%20Nusantara.%20Apakah%20masih%20tersedia%3F"
+                    class="btn-wa" target="_blank">
+                    <i class="fab fa-whatsapp"></i> Tanya Caterer
                 </a>
             </div>
-            
+
             <!-- Divider -->
             <hr class="divider">
-            
+
             <!-- Back Button -->
             <a href="../index.php" class="btn-back">
-                <i class="fas fa-arrow-left"></i> Kembali ke Beranda
+                <i class="fas fa-arrow-left"></i> Kembali ke Katalog
             </a>
         </div>
     </div>
-    
+
     <script>
         // Smooth loading untuk gambar
         const img = document.querySelector('.product-image');
@@ -542,4 +480,5 @@ if (!$valid_image) {
         }
     </script>
 </body>
+
 </html>

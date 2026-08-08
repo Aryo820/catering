@@ -132,14 +132,14 @@ if (isset($conn)) {
             }
 
             debounceTimer = setTimeout(() => {
-                fetch('/katalog/search.php?q=' + encodeURIComponent(keyword))
+                fetch('<?= SITE_URL ?>search.php?q=' + encodeURIComponent(keyword))
                 .then(response => response.json())
                 .then(data => {
                     if (data.results.length > 0) {
                         let html = '';
                         data.results.forEach(item => {
                             html += `
-                                <a href="/katalog/detail/index.php?id=${item.id}" class="search-result-item" onclick="trackUserBehavior('view', '${item.name.replace(/'/g, "\\'")}')">
+                                <a href="<?= SITE_URL ?>detail/index.php?id=${item.id}" class="search-result-item" onclick="trackUserBehavior('view', '${item.name.replace(/'/g, "\\'")}')">
                                     <img src="${item.image_url}" alt="${item.name}" class="search-result-img">
                                     <div class="search-result-info">
                                         <div class="search-result-name">${escapeHtml(item.name)}</div>
@@ -171,7 +171,7 @@ if (isset($conn)) {
         const badge = document.getElementById('cartCount');
         if (!badge) return;
 
-        fetch('/katalog/ajax/cart_ajax.php', {
+        fetch('<?= SITE_URL ?>ajax/cart_ajax.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -195,7 +195,7 @@ if (isset($conn)) {
     }
 
     function updateButtonStatus() {
-        fetch('/katalog/ajax/cart_ajax.php', {
+        fetch('<?= SITE_URL ?>ajax/cart_ajax.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -256,7 +256,7 @@ if (isset($conn)) {
         // Track perilaku menyimpan produk untuk promo
         trackUserBehavior('save', productName);
         
-        fetch('/katalog/ajax/cart_ajax.php', {
+        fetch('<?= SITE_URL ?>ajax/cart_ajax.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',

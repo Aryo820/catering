@@ -3,10 +3,8 @@
 // LOGOUT - LSP COACHPRO INDONESIA
 // ============================================================
 
-// Pastikan session dimulai
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Load config (memulai session + definisikan SITE_URL)
+require_once __DIR__ . '/config.php';
 
 // Hapus semua data session
 $_SESSION = [];
@@ -14,7 +12,6 @@ $_SESSION = [];
 // Hancurkan session
 session_destroy();
 
-// Redirect ke halaman login admin
-header('Location: admin/login.php');
+// Redirect absolut ke login admin (benar dari folder mana pun)
+header('Location: ' . SITE_URL . 'admin/login.php');
 exit;
-?>

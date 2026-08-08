@@ -4,11 +4,11 @@
         <h3><i class="fas fa-certificate" style="color: #e8b830;"></i> LSP <span style="color: #e8b830;">COACHPRO</span></h3>
         <p>Admin Panel</p>
     </div>
-    
+
     <ul class="sidebar-menu">
-        <?php 
+        <?php
         // Gunakan variabel helper untuk menentukan menu aktif
-        $active_page = basename($_SERVER['PHP_SELF']); 
+        $active_page = basename($_SERVER['PHP_SELF']);
         $active_dir = basename(dirname($_SERVER['PHP_SELF']));
         ?>
         <li class="<?= ($active_page == 'index.php') ? 'active' : '' ?>">
@@ -30,9 +30,9 @@
             </a>
         </li>
     </ul>
-    
+
     <div class="sidebar-divider"></div>
-    
+
     <ul class="sidebar-menu">
         <li class="<?= ($active_page == 'settings.php') ? 'active' : '' ?>">
             <a href="settings.php">
@@ -47,7 +47,7 @@
             </a>
         </li>
     </ul>
-    
+
     <div class="sidebar-footer">
         <p>&copy; <?= date('Y') ?> <strong>LSP COACHPRO INDONESIA</strong></p>
         <p>Version 1.0</p>
@@ -60,21 +60,21 @@
             const mobileToggle = document.getElementById('mobileToggle');
             const adminSidebar = document.getElementById('adminSidebar');
             const sidebarOverlay = document.getElementById('sidebarOverlay');
-            
+
             if (!mobileToggle || !adminSidebar) return;
-            
+
             function openSidebar() {
                 adminSidebar.classList.add('open');
                 if (sidebarOverlay) sidebarOverlay.classList.add('active');
                 document.body.style.overflow = 'hidden';
             }
-            
+
             function closeSidebar() {
                 adminSidebar.classList.remove('open');
                 if (sidebarOverlay) sidebarOverlay.classList.remove('active');
                 document.body.style.overflow = '';
             }
-            
+
             mobileToggle.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -84,11 +84,11 @@
                     openSidebar();
                 }
             });
-            
+
             if (sidebarOverlay) {
                 sidebarOverlay.addEventListener('click', closeSidebar);
             }
-            
+
             const sidebarLinks = adminSidebar.querySelectorAll('a');
             sidebarLinks.forEach(function(link) {
                 link.addEventListener('click', function() {
@@ -97,7 +97,7 @@
                     }
                 });
             });
-            
+
             let resizeTimer;
             window.addEventListener('resize', function() {
                 clearTimeout(resizeTimer);
@@ -108,7 +108,7 @@
                 }, 250);
             });
         }
-        
+
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initSidebar);
         } else {

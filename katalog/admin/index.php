@@ -102,27 +102,34 @@ include 'includes/header.php';
             <canvas id="categoryChart"></canvas>
         </div>
     </div>
-    
+
     <!-- Produk Terbaru -->
     <div class="dashboard-card">
         <h3><i class="fas fa-clock"></i> Produk Terbaru</h3>
         <div style="overflow-x: auto;">
             <table class="recent-table">
                 <thead>
-                    <tr><th>ID</th><th>Nama Produk</th><th>Kategori</th><th>Harga</th></tr>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nama Produk</th>
+                        <th>Kategori</th>
+                        <th>Harga</th>
+                    </tr>
                 </thead>
                 <tbody>
                     <?php if (mysqli_num_rows($recent_products) > 0): ?>
-                        <?php while($p = mysqli_fetch_assoc($recent_products)): ?>
-                        <tr>
-                            <td><?= $p['id'] ?></td>
-                            <td><?= htmlspecialchars(substr($p['name'], 0, 25)) ?>...</td>
-                            <td><span class="badge"><?= htmlspecialchars($p['category_name']) ?></span></td>
-                            <td><?= htmlspecialchars($p['price']) ?></td>
-                        </tr>
+                        <?php while ($p = mysqli_fetch_assoc($recent_products)): ?>
+                            <tr>
+                                <td><?= $p['id'] ?></td>
+                                <td><?= htmlspecialchars(substr($p['name'], 0, 25)) ?>...</td>
+                                <td><span class="badge"><?= htmlspecialchars($p['category_name']) ?></span></td>
+                                <td><?= htmlspecialchars($p['price']) ?></td>
+                            </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
-                        <tr><td colspan="4" style="text-align: center;">Belum ada produk</td></tr>
+                        <tr>
+                            <td colspan="4" style="text-align: center;">Belum ada produk</td>
+                        </tr>
                     <?php endif; ?>
                 </tbody>
             </table>
@@ -175,21 +182,23 @@ include 'includes/header.php';
             responsive: true,
             maintainAspectRatio: true,
             plugins: {
-                legend: { 
-                    position: 'bottom', 
-                    labels: { 
-                        font: { size: 11 },
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        font: {
+                            size: 11
+                        },
                         boxWidth: 12,
                         padding: 10
-                    } 
+                    }
                 }
             }
         }
     });
 </script>
 
-<?php 
+<?php
 // Tutup resource statement yang masih terbuka (recent_products)
 mysqli_stmt_close($stmt_recent);
-include 'includes/footer.php'; 
+include 'includes/footer.php';
 ?>
