@@ -60,26 +60,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_action'])) {
 }
 
 // --- HAPUS KATEGORI ---
-if (isset($_GET['delete'])) {
-    $cat_id = (int)$_GET['delete'];
-    
-    // --- PERBAIKAN KEAMANAN: Cek apakah kategori memiliki produk ---
-    $stmt_check_prod = mysqli_prepare($conn, "SELECT id FROM products WHERE category_id = ? LIMIT 1");
-    mysqli_stmt_bind_param($stmt_check_prod, "i", $cat_id);
-    mysqli_stmt_execute($stmt_check_prod);
-    $result_check_prod = mysqli_stmt_get_result($stmt_check_prod);
-    
-    if (mysqli_num_rows($result_check_prod) > 0) {
-        $_SESSION['error'] = "Kategori tidak bisa dihapus karena masih memiliki produk!";
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['category_action'] ?? '') === 'delete') {
+    $cat_id = (int)($_POST['cat_id'] ?? 0);
+    if ($cat_id > 0) {
+        // --- Cek apakah kategori memiliki produk ---
+        $stmt_check_prod = mysqli_prepare($conn, "SELECT id FROM products WHERE category_id = ? LIMIT 1");
+        mysqli_stmt_bind_param($stmt_check_prod, "i", $cat_id);
+        mysqli_stmt_execute($stmt_check_prod);
+        $result_check_prod = mysqli_stmt_get_result($stmt_check_prod);
+
+        if (mysqli_num_rows($result_check_prod) > 0) {
+            $_SESSION['error'] = "Kategori tidak bisa dihapus karena masih memiliki produk!";
+        } else {
+            $stmt_delete = mysqli_prepare($conn, "DELETE FROM categories WHERE id = ?");
+            mysqli_stmt_bind_param($stmt_delete, "i", $cat_id);
+            mysqli_stmt_execute($stmt_delete);
+            mysqli_stmt_close($stmt_delete);
+            $_SESSION['success'] = "Kategori berhasil dihapus!";
+        }
         mysqli_stmt_close($stmt_check_prod);
-    } else {
-        mysqli_stmt_close($stmt_check_prod);
-        // --- PERBAIKAN KEAMANAN: Delete dengan Prepared Statement ---
-        $stmt_delete = mysqli_prepare($conn, "DELETE FROM categories WHERE id = ?");
-        mysqli_stmt_bind_param($stmt_delete, "i", $cat_id);
-        mysqli_stmt_execute($stmt_delete);
-        mysqli_stmt_close($stmt_delete);
-        $_SESSION['success'] = "Kategori berhasil dihapus!";
     }
     header('Location: categories.php');
     exit;
@@ -183,7 +182,11 @@ include 'includes/header.php';
                     <td style="padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">
                         <a href="?edit=<?= $cat['id'] ?>" style="color: #f59e0b; text-decoration: none; margin-right: 10px;"><i class="fas fa-edit"></i> Edit</a>
                         <?php if ($cat['product_count'] == 0): ?>
-                            <a href="?delete=<?= $cat['id'] ?>" style="color: #ef4444; text-decoration: none;" onclick="return confirm('Yakin hapus kategori ini?')"><i class="fas fa-trash"></i> Hapus</a>
+                            <form method="POST" style="display:inline;" onsubmit="return confirm('Yakin hapus kategori ini?')">
+                                <input type="hidden" name="category_action" value="delete">
+                                <input type="hidden" name="cat_id" value="<?= $cat['id'] ?>">
+                                <button type="submit" style="color: #ef4444; background: none; border: none; cursor: pointer;" title="Hapus Kategori"><i class="fas fa-trash"></i> Hapus</button>
+                            </form>
                         <?php else: ?>
                             <span style="color: #94a3b8; cursor: not-allowed;" title="Kategori memiliki produk, tidak bisa dihapus"><i class="fas fa-trash"></i> Hapus</span>
                         <?php endif; ?>

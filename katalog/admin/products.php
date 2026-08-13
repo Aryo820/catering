@@ -12,12 +12,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['product_action'])) {
     $name = clean_input($_POST['name']);
     $category_id = (int)$_POST['category_id'];
     $desc = clean_input($_POST['description']);
-    $price = clean_input($_POST['price']);
+    // Normalisasi harga ke angka bersih (varchar kosong = 0) agar number_format/getCartTotal konsisten
+    $price = (string)normalize_price($_POST['price'] ?? '0');
     $demo_link = clean_input($_POST['demo_link']);
     $wa_number = clean_input($_POST['wa_number']);
     
     // Proses upload gambar
-    $image_url = $_POST['old_image'] ?? '';
+    // old_image dari hidden field ber-HTML entity (htmlspecialchars saat render) → decode dulu
+    $image_url = isset($_POST['old_image']) ? htmlspecialchars_decode($_POST['old_image'], ENT_QUOTES) : '';
     
     if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] === UPLOAD_ERR_OK) {
         // === PERBAIKAN PATH UPLOAD ===
@@ -31,12 +33,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['product_action'])) {
         } else {
             $upload_dir = __DIR__ . '/../uploads/';
             if (!file_exists($upload_dir)) {
-                mkdir($upload_dir, 0777, true);
+                mkdir($upload_dir, 0755, true);
             }
         }
         
         // Set permission
-        chmod($upload_dir, 0777);
+        chmod($upload_dir, 0755);
         
         $file = $_FILES['product_image'];
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
@@ -114,31 +116,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['product_action'])) {
 }
 
 // --- HAPUS PRODUK ---
-if (isset($_GET['delete'])) {
-    $id = (int)$_GET['delete'];
-    
-    // Ambil gambar untuk dihapus
-    $stmt_img = mysqli_prepare($conn, "SELECT image_url FROM products WHERE id = ?");
-    mysqli_stmt_bind_param($stmt_img, "i", $id);
-    mysqli_stmt_execute($stmt_img);
-    $res_img = mysqli_stmt_get_result($stmt_img);
-    $img_data = mysqli_fetch_assoc($res_img);
-    mysqli_stmt_close($stmt_img);
-    
-    if ($img_data && !empty($img_data['image_url']) && strpos($img_data['image_url'], 'uploads/') !== false) {
-        $file_to_delete = __DIR__ . '/../' . $img_data['image_url'];
-        if (file_exists($file_to_delete)) {
-            unlink($file_to_delete);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['product_action'] ?? '') === 'delete') {
+    $id = (int)($_POST['id'] ?? 0);
+    if ($id > 0) {
+        // Ambil gambar untuk dihapus
+        $stmt_img = mysqli_prepare($conn, "SELECT image_url FROM products WHERE id = ?");
+        mysqli_stmt_bind_param($stmt_img, "i", $id);
+        mysqli_stmt_execute($stmt_img);
+        $res_img = mysqli_stmt_get_result($stmt_img);
+        $img_data = mysqli_fetch_assoc($res_img);
+        mysqli_stmt_close($stmt_img);
+
+        if ($img_data && !empty($img_data['image_url']) && strpos($img_data['image_url'], 'uploads/') !== false) {
+            $file_to_delete = __DIR__ . '/../' . $img_data['image_url'];
+            if (file_exists($file_to_delete)) {
+                unlink($file_to_delete);
+            }
         }
+
+        // Hapus produk
+        $stmt_del = mysqli_prepare($conn, "DELETE FROM products WHERE id = ?");
+        mysqli_stmt_bind_param($stmt_del, "i", $id);
+        mysqli_stmt_execute($stmt_del);
+        mysqli_stmt_close($stmt_del);
+
+        $_SESSION['success'] = "Produk berhasil dihapus!";
     }
-    
-    // Hapus produk
-    $stmt_del = mysqli_prepare($conn, "DELETE FROM products WHERE id = ?");
-    mysqli_stmt_bind_param($stmt_del, "i", $id);
-    mysqli_stmt_execute($stmt_del);
-    mysqli_stmt_close($stmt_del);
-    
-    $_SESSION['success'] = "Produk berhasil dihapus!";
     header('Location: products.php');
     exit;
 }
@@ -624,9 +627,13 @@ include 'includes/header.php';
                             <a href="?edit=<?= $p['id'] ?>" class="btn-warning" style="font-size: 0.9rem;">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
-                            <a href="?delete=<?= $p['id'] ?>" class="btn-danger" style="font-size: 0.9rem;" onclick="return confirm('Yakin hapus produk ini?')">
-                                <i class="fas fa-trash"></i> Hapus
-                            </a>
+                            <form method="POST" style="display:inline;" onsubmit="return confirm('Yakin hapus produk ini?')">
+                                <input type="hidden" name="product_action" value="delete">
+                                <input type="hidden" name="id" value="<?= $p['id'] ?>">
+                                <button type="submit" class="btn-danger" style="font-size: 0.9rem;">
+                                    <i class="fas fa-trash"></i> Hapus
+                                </button>
+                            </form>
                         </div>
                     </td>
                 </tr>

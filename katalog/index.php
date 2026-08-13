@@ -311,7 +311,7 @@ if (isset($_SESSION['cart'])) {
 
                             <!-- TOMBOL SIMPAN / PESAN -->
                             <button class="btn-cart"
-                                onclick="addToCart(<?= $product['id'] ?>, '<?= addslashes(htmlspecialchars($product['name'])) ?>', '<?= addslashes(htmlspecialchars($product['price'])) ?>')">
+                                onclick='addToCart(<?= (int)$product['id'] ?>, <?= json_encode($product['name']) ?>, <?= json_encode($product['price']) ?>)'>
                                 <i class="fas fa-shopping-cart"></i> Pesan Sekarang
                             </button>
 

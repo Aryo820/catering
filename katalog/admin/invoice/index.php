@@ -1,7 +1,4 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 $page_title = 'Daftar Invoice - LSP COACHPRO INDONESIA';
 require_once '../../config.php';
 
@@ -143,7 +140,10 @@ include '../includes/header.php';
                         <a href="edit.php?id=<?= $inv['id'] ?>" style="color: #e8b830; margin-right: 5px;" title="Edit"><i class="fas fa-edit"></i></a>
                         <a href="../../public/invoice/view.php?link=<?= $inv['unique_link'] ?>" target="_blank" style="color: #1f2462; margin-right: 5px;" title="Lihat"><i class="fas fa-eye"></i></a>
                         <a href="../../pdf/generate.php?link=<?= $inv['unique_link'] ?>" target="_blank" style="color: #10b981; margin-right: 5px;" title="PDF"><i class="fas fa-file-pdf"></i></a>
-                        <a href="delete.php?id=<?= $inv['id'] ?>" style="color: #dc2626;" onclick="return confirm('Yakin hapus?')" title="Hapus"><i class="fas fa-trash"></i></a>
+                        <form method="POST" action="delete.php" style="display:inline;" onsubmit="return confirm('Yakin hapus?')">
+                            <input type="hidden" name="id" value="<?= $inv['id'] ?>">
+                            <button type="submit" style="color: #dc2626; background: none; border: none; cursor: pointer;" title="Hapus"><i class="fas fa-trash"></i></button>
+                        </form>
                     </td>
                 </tr>
                 <?php endforeach; ?>

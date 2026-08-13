@@ -14,8 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_settings'])) {
     $site_name = clean_input($_POST['site_name']);
     $wa_number = clean_input($_POST['wa_number']);
     $footer_copyright = clean_input($_POST['footer_copyright']);
-    $footer_credit_left = clean_input($_POST['footer_credit_left']);
-    $footer_credit_right = clean_input($_POST['footer_credit_right']);
+    // footer_credit_* sengaja boleh berisi HTML (icon) → simpan mentah, admin trusted
+    $footer_credit_left = trim($_POST['footer_credit_left'] ?? '');
+    $footer_credit_right = trim($_POST['footer_credit_right'] ?? '');
     
     // Ambil input CTA (Smart Promo)
     $cta_title = clean_input($_POST['cta_title']);

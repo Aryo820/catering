@@ -97,58 +97,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($total < 0) $total = 0;
 
         $invoice_number = generate_invoice_number();
-        $unique_link = generate_invoice_link(12);
 
-        while (true) {
+        // Cek unik, maks 10 percobaan agar tidak hang jika tabrakan tak terduga
+        $unique_link = generate_invoice_link(12);
+        $link_ok = false;
+        for ($attempt = 0; $attempt < 10; $attempt++) {
             $stmt_cek = mysqli_prepare($conn, "SELECT id FROM invoices WHERE unique_link = ?");
             mysqli_stmt_bind_param($stmt_cek, "s", $unique_link);
             mysqli_stmt_execute($stmt_cek);
             $result_cek = mysqli_stmt_get_result($stmt_cek);
-            if (mysqli_num_rows($result_cek) == 0) break;
+            $is_unique = mysqli_num_rows($result_cek) == 0;
             mysqli_stmt_close($stmt_cek);
+            if ($is_unique) { $link_ok = true; break; }
             $unique_link = generate_invoice_link(12);
         }
-        mysqli_stmt_close($stmt_cek);
 
-        $stmt_insert = mysqli_prepare($conn, "INSERT INTO invoices (
-                    invoice_number, client_name, client_email, client_phone, client_address,
-                    service_name, service_description, guide_content, schedule,
-                    amount, tax, discount, total,
-                    status, issue_date, due_date, notes, unique_link, product_id
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-        mysqli_stmt_bind_param(
-            $stmt_insert,
-            "sssssssssddddsssssi",
-            $invoice_number,
-            $client_name,
-            $client_email,
-            $client_phone,
-            $client_address,
-            $service_name,
-            $service_description,
-            $guide_content,
-            $schedule,
-            $amount,
-            $tax,
-            $discount,
-            $total,
-            $status,
-            $issue_date,
-            $due_date,
-            $notes,
-            $unique_link,
-            $product_id
-        );
-
-        if (mysqli_stmt_execute($stmt_insert)) {
-            $success = 'Invoice berhasil dibuat!';
-            mysqli_stmt_close($stmt_insert);
-            $form_data = [];
-            header("refresh:2;url=index.php");
+        if (!$link_ok) {
+            $error = 'Gagal membuat link unik invoice, coba lagi.';
         } else {
-            $error = 'Gagal menyimpan invoice: ' . mysqli_error($conn);
-            mysqli_stmt_close($stmt_insert);
+            $stmt_insert = mysqli_prepare($conn, "INSERT INTO invoices (
+                        invoice_number, client_name, client_email, client_phone, client_address,
+                        service_name, service_description, guide_content, schedule,
+                        amount, tax, discount, total,
+                        status, issue_date, due_date, notes, unique_link, product_id
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+            mysqli_stmt_bind_param(
+                $stmt_insert,
+                "sssssssssddddsssssi",
+                $invoice_number,
+                $client_name,
+                $client_email,
+                $client_phone,
+                $client_address,
+                $service_name,
+                $service_description,
+                $guide_content,
+                $schedule,
+                $amount,
+                $tax,
+                $discount,
+                $total,
+                $status,
+                $issue_date,
+                $due_date,
+                $notes,
+                $unique_link,
+                $product_id
+            );
+
+            if (mysqli_stmt_execute($stmt_insert)) {
+                $success = 'Invoice berhasil dibuat!';
+                mysqli_stmt_close($stmt_insert);
+                $form_data = [];
+                header("refresh:2;url=index.php");
+            } else {
+                $error = 'Gagal menyimpan invoice: ' . mysqli_error($conn);
+                mysqli_stmt_close($stmt_insert);
+            }
         }
     }
 }

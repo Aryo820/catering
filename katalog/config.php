@@ -25,12 +25,15 @@ if (!$conn) {
 // ============================================================
 
 /**
- * Sanitasi input untuk keamanan
+ * Sanitasi input untuk keamanan (hanya escape DB; HTML escape dilakukan saat output)
  */
 function clean_input($data)
 {
     global $conn;
-    return mysqli_real_escape_string($conn, htmlspecialchars(strip_tags(trim($data))));
+    $data = trim($data);
+    // strip_tags tetap dilakukan di sisi input untuk buang tag berbahaya,
+    // tapi htmlspecialchars TIDAK — itu tanggung jawab saat menampilkan (sanitize_output)
+    return mysqli_real_escape_string($conn, strip_tags($data));
 }
 
 /**
@@ -58,15 +61,22 @@ function require_login()
  */
 function format_rupiah($amount)
 {
+    // Cast ke string agar aman menerima int dari DB (PHP 8 strpos menolak int)
+    $amount = (string)$amount;
+
     // Jika sudah ada format Rp, langsung return
+    if ($amount === '' || $amount === '0' || $amount === '0.00') {
+        return 'Rp 0';
+    }
     if (strpos($amount, 'Rp') !== false) {
         return $amount;
     }
     $number = preg_replace('/[^0-9]/', '', $amount);
     if (is_numeric($number) && $number > 0) {
-        return 'Rp ' . number_format($number, 0, ',', '.');
+        return 'Rp ' . number_format((int)$number, 0, ',', '.');
     }
-    return $amount;
+    // Fallback: bukan angka valid → tampilkan nol agar tidak kosong/blank
+    return is_numeric($amount) ? 'Rp ' . number_format((float)$amount, 0, ',', '.') : 'Rp 0';
 }
 
 /**
@@ -213,7 +223,16 @@ function redirect($url)
  */
 function sanitize_output($input)
 {
-    return htmlspecialchars($input, ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars((string)$input, ENT_QUOTES, 'UTF-8');
+}
+
+/**
+ * Normalisasi harga dari berbagai format ("Rp 2.500.000", "2500000", "") ke integer
+ */
+function normalize_price($value)
+{
+    $value = is_string($value) ? preg_replace('/[^0-9]/', '', $value) : (string)(int)$value;
+    return (int)$value;
 }
 
 /**
@@ -223,7 +242,7 @@ function upload_image($file, $target_dir = 'uploads/')
 {
     // Buat folder jika belum ada
     if (!is_dir($target_dir)) {
-        mkdir($target_dir, 0777, true);
+        mkdir($target_dir, 0755, true);
     }
 
     $file_name = time() . '_' . basename($file['name']);
@@ -282,7 +301,7 @@ function get_admin_url()
 // ============================================================
 
 // Konfigurasi dasar
-define('SITE_NAME', 'LSP COACHPRO INDONESIA');
+define('SITE_NAME', 'Dapur Nusantara');
 
 // Deteksi URL otomatis: SELALU folder katalog, tidak bergantung halaman yang dibuka
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
@@ -299,6 +318,7 @@ if ($doc_root && strpos($site_dir, $doc_root) === 0) {
 }
 
 define('SITE_URL', $base_url);
+define('ROOT_URL', str_replace('/katalog/', '/', SITE_URL));
 define('ADMIN_URL', SITE_URL . 'admin/');
 define('UPLOAD_DIR', __DIR__ . '/uploads/');
 define('UPLOAD_URL', SITE_URL . 'uploads/');

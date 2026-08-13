@@ -414,7 +414,7 @@
             }
             ?>
 
-            <a href="<?= SITE_URL ?? './' ?>" class="logo-area">
+            <a href="<?= SITE_URL ?? 'index.php' ?>" class="logo-area">
                 <?php if (!empty($logo_url)): ?>
                     <img src="<?= htmlspecialchars($logo_url) ?>" alt="<?= htmlspecialchars($site_name) ?>" class="logo-img">
                 <?php else: ?>

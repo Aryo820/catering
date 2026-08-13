@@ -446,7 +446,7 @@ if (!$valid_image) {
             <div class="button-group">
                 <!-- Tombol Simpan ke Cart -->
                 <button class="btn-cart"
-                    onclick="addToCart(<?= $product['id'] ?>, '<?= addslashes(htmlspecialchars($product['name'])) ?>', '<?= addslashes(htmlspecialchars($product['price'])) ?>')">
+                    onclick='addToCart(<?= (int)$product['id'] ?>, <?= json_encode($product['name']) ?>, <?= json_encode($product['price']) ?>)'>
                     <i class="fas fa-shopping-bag"></i> Pesan Sekarang
                 </button>
 

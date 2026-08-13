@@ -147,7 +147,7 @@ include 'includes/header.php';
         <i class="fas fa-list"></i>
         <span>Kelola Kategori</span>
     </a>
-    <a href="footer_settings.php" class="menu-item">
+    <a href="settings.php" class="menu-item">
         <i class="fas fa-edit"></i>
         <span>Pengaturan Footer</span>
     </a>
@@ -155,7 +155,7 @@ include 'includes/header.php';
         <i class="fas fa-sliders-h"></i>
         <span>Pengaturan WA</span>
     </a>
-    <a href="guide_settings.php" class="menu-item">
+    <a href="product_guide.php" class="menu-item">
         <i class="fas fa-book"></i>
         <span>Panduan Invoice</span>
     </a>

@@ -42,7 +42,61 @@ mysqli_stmt_close($stmt_prod);
 $error = '';
 $success = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // ... (logika update sama seperti create, hanya dengan WHERE id = ?)
+    $client_name = trim($_POST['client_name'] ?? '');
+    $client_email = trim($_POST['client_email'] ?? '');
+    $client_phone = trim($_POST['client_phone'] ?? '');
+    $client_address = trim($_POST['client_address'] ?? '');
+    $service_name = trim($_POST['service_name'] ?? '');
+    $service_description = trim($_POST['service_description'] ?? '');
+    $guide_content = trim($_POST['guide_content'] ?? '');
+    $schedule = trim($_POST['schedule'] ?? '');
+    $product_id = (int)($_POST['product_id'] ?? 0);
+
+    $price_raw = $_POST['price'] ?? '0';
+    $amount = (float)preg_replace('/[^0-9]/', '', $price_raw);
+    $tax = isset($_POST['tax']) ? (float)$_POST['tax'] : 0;
+    $discount = isset($_POST['discount']) ? (float)$_POST['discount'] : 0;
+    $issue_date = $_POST['issue_date'] ?? $invoice['issue_date'];
+    $due_date = $_POST['due_date'] ?? $invoice['due_date'];
+    $notes = trim($_POST['notes'] ?? '');
+    $status = $_POST['status'] ?? $invoice['status'];
+
+    $errors = [];
+    if ($client_name === '') $errors[] = 'Nama klien wajib diisi!';
+    if ($service_name === '') $errors[] = 'Nama layanan wajib diisi!';
+    if ($amount <= 0) $errors[] = 'Jumlah wajib diisi dan harus lebih dari 0!';
+
+    if (!empty($errors)) {
+        $error = implode('<br>', $errors);
+    } else {
+        $total = $amount + $tax - $discount;
+        if ($total < 0) $total = 0;
+
+        $stmt_update = mysqli_prepare($conn, "UPDATE invoices SET
+            client_name = ?, client_email = ?, client_phone = ?, client_address = ?,
+            service_name = ?, service_description = ?, guide_content = ?, schedule = ?,
+            amount = ?, tax = ?, discount = ?, total = ?,
+            status = ?, issue_date = ?, due_date = ?, notes = ?, product_id = ?
+            WHERE id = ?");
+        mysqli_stmt_bind_param(
+            $stmt_update,
+            "sssssssssddddssssi",
+            $client_name, $client_email, $client_phone, $client_address,
+            $service_name, $service_description, $guide_content, $schedule,
+            $amount, $tax, $discount, $total,
+            $status, $issue_date, $due_date, $notes, $product_id,
+            $id
+        );
+        if (mysqli_stmt_execute($stmt_update)) {
+            $success = 'Invoice berhasil diupdate!';
+            mysqli_stmt_close($stmt_update);
+            header("refresh:2;url=index.php");
+            exit;
+        } else {
+            $error = 'Gagal mengupdate invoice: ' . mysqli_error($conn);
+            mysqli_stmt_close($stmt_update);
+        }
+    }
 }
 
 include '../includes/header.php';
